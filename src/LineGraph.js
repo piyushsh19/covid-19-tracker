@@ -16,7 +16,7 @@ const options = {
         mode: 'index',
         intersect: false,
         callbacks: {
-            label: function (tooltipItem,  data) {
+            label: function (tooltipItem, data) {
                 return numeral(tooltipItem.value).format("+0,0");
             }, 
         },
@@ -48,15 +48,15 @@ const options = {
 
 
 const buildChartData = (data, casesType="cases") => {
-    const chartData = [];
+    let chartData = [];
 
     let lastDataPoint;
     for(let date in data.cases){
        if(lastDataPoint) {
-            const newDataPoint = {
+            let newDataPoint = {
                 x: date,
-                y: data[casesType][date] - lastDataPoint  
-            }
+                y: data[casesType][date] - lastDataPoint,  
+            };
            chartData.push(newDataPoint); 
        }
        lastDataPoint =data[casesType][date];
@@ -64,26 +64,27 @@ const buildChartData = (data, casesType="cases") => {
     return chartData;
 }
 
-function LineGraph({ casesType="cases"}) {
+function LineGraph({ casesType="cases", ...props}) {
     const [data, setData] = useState({})
 
     useEffect(() => {
         const fetchData = async ()=> {
-            await fetch("https://disease.sh/v3/covid-19/historical/all?lastdays=120")
-            .then(response => response.json())
+            await fetch("https://disease.sh/v3/covid-19/historical/all?lastdays=80")
+            .then((response) => {
+                return response.json();})
             .then(data=>{
-                const chartData = buildChartData(data);
+                let chartData = buildChartData(data, casesType);
                 setData(chartData);    
             })
         }
         fetchData();
-    }, [casesType])
+    }, [casesType]);
 
 
     return (
-        <div>
+        <div className={props.className}>
             <h1>I am a graph</h1>
-            {data ?.length> 0 && (
+            {data?.length > 0 && (
                 <Line 
                 options={options}
                 data ={{
@@ -92,8 +93,8 @@ function LineGraph({ casesType="cases"}) {
                             backgroundColor: "rgba(204,16,52,0.5)",
                             borderColor: "#CC1034",
                             data:data,
-                        }
-                    ]
+                        },
+                    ],
                 }}
                  />
             )}

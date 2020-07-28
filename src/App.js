@@ -4,7 +4,7 @@ import { FormControl, MenuItem, Select, Card, CardContent } from '@material-ui/c
 import InfoBox from './InfoBox';
 import Map from './Map';
 import Table from "./Table";
-import { sortData} from "./util";
+import { sortData, prettyPrintStat} from "./util";
 import LineGraph from './LineGraph';
 import "leaflet/dist/leaflet.css";
 
@@ -17,6 +17,7 @@ function App() {
   const [mapCenter, setmapCenter] = useState({lat: 20.5937, lng: 78.9629});
   const [mapZoom, setmapZoom] = useState(3);
   const [mapCountries, setmapCountries] = useState([]);
+  const [casesType, setcasesType] = useState("cases")
  
 // world data
   useEffect(() => {
@@ -85,11 +86,29 @@ function App() {
         </FormControl> 
         </div>
         <div className="app__status">
-          <InfoBox title='Coronaases' cases={countryInfo.todayCases} total={countryInfo.cases}/>
-          <InfoBox title='Recovered' cases={countryInfo.todayRecovered} total={countryInfo.recovered}/>
-          <InfoBox title='Death' cases={countryInfo.todayDeaths} total={countryInfo.deaths}/>
+          <InfoBox
+          isRed
+          active={casesType==="cases"}
+          onClick = {(e) => setcasesType("cases")}
+          title='Coronaases'
+          cases={prettyPrintStat(countryInfo.todayCases)} 
+          total={prettyPrintStat(countryInfo.cases)}/>
+          <InfoBox 
+          active={casesType==="recovered"}
+          onClick = {(e) => setcasesType("recovered")}
+          title='Recovered' 
+          cases={prettyPrintStat(countryInfo.todayRecovered)} 
+          total={prettyPrintStat(countryInfo.recovered)}/>
+          <InfoBox
+          isRed 
+          active={casesType==="deaths"} 
+          onClick = {(e) => setcasesType("deaths")}
+          title='Death' 
+          cases={prettyPrintStat(countryInfo.todayDeaths)} 
+          total={prettyPrintStat(countryInfo.deaths)}/>
         </div>
         <Map
+        casesType ={casesType}
         countries={mapCountries}
         center={mapCenter}
         zoom={mapZoom}
@@ -100,8 +119,8 @@ function App() {
            <CardContent>
              <h2>Live Cases by Country</h2>
              <Table countries={tableData} />
-             <h3> WorldWideCases</h3>
-             <LineGraph />
+              <h3 className="app__graphtitle"> Worldwide new {casesType}</h3>
+             <LineGraph className="app__graph" casesType={casesType}/>
            </CardContent>
          </Card>
       </div>

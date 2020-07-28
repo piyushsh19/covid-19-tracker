@@ -7,7 +7,7 @@ function Table({ countries }) {
             {countries.map(({country,cases}) => (
                 <tr>
                     <td>{country}</td>
-                    <td>{cases}</td>
+                    <td>{(cases)}</td>
                 </tr>
             ))}
             
